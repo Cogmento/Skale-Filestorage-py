@@ -1,0 +1,4 @@
+{"HTTPprovider":"put your httpprovider here (ask for one from SKALE)",
+"PrivateKey":"some test accounts privatekey - don't have real ETH in there. Ask for test ETH from SKALE",
+"FileName":"Some filename you want to upload and dowload later",
+"Path":"The path of that file on your os"}
