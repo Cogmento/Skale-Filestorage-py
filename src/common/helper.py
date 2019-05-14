@@ -16,18 +16,18 @@ class Helper:
         if len(x) < 2:
             return False
         else:
-            return x[:2]=='0x'
+            return x[:2]==b'0x'
 
 
     def addBytesSymbol(self, x: str):
-        if self.ensureStartsWith0x():
+        if self.ensureStartsWith0x(x):
             return x
         else:
-            return '0x' + x
+            return b'0x' + x
 
 
     def rmBytesSymbol(self, x: str):
-        if not self.ensureStartsWith0x():
+        if not self.ensureStartsWith0x(x):
             return x
         else:
             return x[2:]
@@ -49,20 +49,23 @@ class Helper:
             print('Incorrect privateKey')
 
 
-    async def signAndSendTransaction(self, web3, account, privateKey, transactionData, gas):
-        encoded = transactionData.encodeABI()
-        contractAddress = transactionData['_parent']['_address']
-        accountFromPrivateKey = web3.eth.accounts.privateKeyToAccount(privateKey)['address']
+    async def signAndSendTransaction(self, web3, privateKey, txData):
+        
+        signed_tx = web3.eth.account.signTransaction(txData, privateKey)
+        web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+        
+        #contractAddress = transactionData['_parent']['_address']
+        #accountFromPrivateKey = web3.eth.accounts.privateKeyToAccount(privateKey)['address']
 
-        if account != accountFromPrivateKey and account != self.rmBytesSymbol(accountFromPrivateKey):
-            print('Keypair mismatch')
+        #if account != accountFromPrivateKey and account != self.rmBytesSymbol(accountFromPrivateKey):
+        #    print('Keypair mismatch') - I'm removing this validation
 
-        tx = {'from': account,
-            'data': encoded,
-            'gas': gas,
-            'to': contractAddress}
-        signedTx = await web3.eth.accounts.signTransaction(tx, privateKey)
-        return await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        #tx = {'from': account,
+        #    'data': encoded,
+        #    'gas': gas,
+        #    'to': contractAddress}
+        #signedTx = await web3.eth.accounts.signTransaction(tx, privateKey)
+        #return await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
 
 
     async def sendTransaction(self, account, transactionData, gas):
